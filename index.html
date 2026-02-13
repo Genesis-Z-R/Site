@@ -9,7 +9,8 @@
     <style>
         :root {
             --primary-pink: #ff2d75;
-            --overlay: rgba(15, 15, 15, 0.4);
+            --accent: #ffd700;
+            --deep-purple: #2a0a16;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -18,29 +19,65 @@
             margin: 0; padding: 0;
             width: 100%; height: 100%;
             font-family: 'Montserrat', sans-serif;
-            background: #000; /* Dark background makes the pinks pop */
+            /* Dynamic animated gradient */
+            background: linear-gradient(45deg, #000000, #1a050d, #000000, #0d051a);
+            background-size: 400% 400%;
+            animation: meshMove 15s ease infinite;
             overflow: hidden;
             color: #fff;
         }
 
-        /* Video Background for the whole site */
-        #bg-video {
-            position: fixed;
-            right: 0; bottom: 0;
-            min-width: 100%; min-height: 100%;
-            z-index: -2;
-            filter: brightness(0.4) blur(3px);
-            object-fit: cover;
+        @keyframes meshMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .overlay-gradient {
+        /* Ambient Background Blur Layers */
+        .bg-blur {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.8) 100%);
-            z-index: -1;
+            z-index: -2;
+            overflow: hidden;
         }
 
-        /* Floating Assets */
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--primary-pink) 0%, transparent 70%);
+            filter: blur(80px);
+            opacity: 0.3;
+            border-radius: 50%;
+            animation: drift 20s infinite alternate;
+        }
+
+        .blob.two {
+            background: radial-gradient(circle, #7000ff 0%, transparent 70%);
+            right: -10%;
+            top: -10%;
+            animation-duration: 25s;
+        }
+
+        @keyframes drift {
+            from { transform: translate(-10%, -10%); }
+            to { transform: translate(20%, 20%); }
+        }
+
+        /* Cursor Heart Trail Styling */
+        .cursor-heart {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 20px;
+            animation: heartFade 1s forwards ease-out;
+        }
+
+        @keyframes heartFade {
+            0% { transform: scale(1) translateY(0); opacity: 1; }
+            100% { transform: scale(1.5) translateY(-50px); opacity: 0; }
+        }
+
         .floating-element {
             position: absolute;
             bottom: -100px;
@@ -51,163 +88,167 @@
 
         @keyframes floatUp {
             0% { transform: translateY(0) scale(0.5); opacity: 0; }
-            20% { opacity: 0.6; }
+            20% { opacity: 0.4; }
             100% { transform: translateY(-120vh) scale(1.2); opacity: 0; }
         }
 
-        /* Cinematic Container */
         .scene {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; padding: 20px;
             opacity: 0;
-            transform: translateY(30px);
-            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(1.1);
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
         }
 
-        .scene.active {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: all;
-        }
+        .scene.active { opacity: 1; transform: scale(1); pointer-events: all; }
 
         h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 2.8rem;
-            margin-bottom: 20px;
-            letter-spacing: -1px;
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            margin-bottom: 10px;
+            background: linear-gradient(to bottom, #fff, #ffb6c1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        p { font-size: 1.1rem; opacity: 0.8; margin-bottom: 30px; }
-
-        /* The Reveal Canvas (Scratch-off) */
-        #scratch-container {
-            position: relative;
-            width: 300px;
-            height: 400px;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 3px solid white;
-            margin-bottom: 20px;
-        }
-
-        #scratch-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            cursor: crosshair;
-            z-index: 2;
-        }
-
-        .under-photo {
+        .video-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
+            max-width: 400px;
+            margin: 20px 0;
         }
 
-        /* Premium Buttons */
+        video {
+            width: 100%;
+            aspect-ratio: 9/16;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .main-pic-styled {
+            width: 200px; height: 200px;
+            border-radius: 50%;
+            border: 4px solid var(--primary-pink);
+            object-fit: cover;
+            margin-bottom: 20px;
+            box-shadow: 0 0 30px rgba(255, 45, 117, 0.4);
+        }
+
         .btn-premium {
             background: #fff;
             color: #000;
             border: none;
-            padding: 18px 40px;
+            padding: 18px 45px;
             border-radius: 100px;
-            font-weight: 600;
-            text-transform: uppercase;
+            font-weight: 700;
             letter-spacing: 2px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(255,255,255,0.2);
+            transition: all 0.3s;
+            box-shadow: 0 15px 35px rgba(255, 45, 117, 0.3);
+            margin-top: 20px;
         }
 
-        .btn-premium:hover {
-            background: var(--primary-pink);
-            color: #fff;
-            transform: scale(1.05);
-        }
+        .btn-premium:active { transform: scale(0.95); }
 
         #no-btn {
             background: transparent;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: #fff;
-            margin-top: 20px;
-            padding: 10px 20px;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8rem;
+            border: none;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
 
-<video autoplay muted loop id="bg-video">
-    <source src="video.mp4" type="video/mp4">
-</video>
-<div class="overlay-gradient"></div>
+<div class="bg-blur">
+    <div class="blob"></div>
+    <div class="blob two"></div>
+</div>
 <div id="hearts-layer"></div>
 
 <div class="scene active" id="scene1">
     <h1>Hey beautiful.</h1>
-    <p>I wanted to show you something...</p>
-    <button class="btn-premium" onclick="moveScene(1, 2)">Open It</button>
+    <p style="opacity: 0.7;">I wanted to show you how much you mean to me...</p>
+    <button class="btn-premium" onclick="moveScene(1, 2)">Open ❤️</button>
 </div>
 
 <div class="scene" id="scene2">
-    <h1>We've gone through a lot.</h1>
-    <p>And every second was a blessing.</p>
-    <button class="btn-premium" onclick="moveScene(2, 3)">Next</button>
+    <h1>You make me happy.</h1>
+    <div class="video-grid">
+        <video autoplay muted loop playsinline><source src="video1.mp4" type="video/mp4"></video>
+        <video autoplay muted loop playsinline><source src="video2.mp4" type="video/mp4"></video>
+        <video autoplay muted loop playsinline><source src="video3.mp4" type="video/mp4"></video>
+        <video autoplay muted loop playsinline><source src="video4.mp4" type="video/mp4"></video>
+    </div>
+    <button class="btn-premium" onclick="moveScene(2, 3)">Continue</button>
 </div>
 
 <div class="scene" id="scene3">
-    <h1>You make me happy.</h1>
-    <p>Rub the screen to reveal a beautiful lady...</p>
-    <div id="scratch-container">
-        <img src="us.JPG" class="under-photo">
-        <canvas id="scratch-canvas" width="300" height="400"></canvas>
-    </div>
-    <button class="btn-premium" onclick="moveScene(3, 4)">Continue</button>
+    <img src="us.JPG" class="main-pic-styled">
+    <h1>Will you be my Valentine?</h1>
+    <button class="btn-premium" id="yes-btn" onclick="finish()">YES</button>
+    <button id="no-btn" onclick="dodge()">No</button>
 </div>
 
 <div class="scene" id="scene4">
-    <h1 id="main-q">Will you be my Valentine?</h1>
-    <button class="btn-premium" id="yes-btn" onclick="finish()">YES</button>
-    <button class="btn-premium" id="no-btn" onclick="dodge()">No</button>
-</div>
-
-<div class="scene" id="scene5">
-    <h1>Happiest person in the world.</h1>
-    <p>I love you so much ❤️</p>
+    <h1 style="font-size: 2.5rem;">You've made me the happiest person in the world.</h1>
+    <p style="font-size: 1.5rem; color: var(--primary-pink);">I love you so much ❤️</p>
 </div>
 
 <script>
     const photos = ['pic1.JPG', 'pic2.JPG', 'pic3.JPG', 'pic4.JPG', 'pic5.JPG', 'pic6.JPG', 'pic7.JPG'];
     let yesScale = 1;
 
-    // Smooth Scene Transition
+    // --- CURSOR HEART TRAIL LOGIC ---
+    function createCursorHeart(x, y) {
+        const heart = document.createElement('div');
+        heart.className = 'cursor-heart';
+        heart.innerHTML = '❤️';
+        heart.style.left = x + 'px';
+        heart.style.top = y + 'px';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+    }
+
+    document.addEventListener('mousemove', (e) => {
+        createCursorHeart(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('touchstart', (e) => {
+        createCursorHeart(e.touches[0].clientX, e.touches[0].clientY);
+    });
+
     function moveScene(current, next) {
         document.getElementById(`scene${current}`).classList.remove('active');
         document.getElementById(`scene${next}`).classList.add('active');
-        if(next === 3) initScratch();
+        
+        if(next === 2) {
+            document.querySelectorAll('video').forEach(v => v.play());
+        }
     }
 
-    // Floating Background Elemenats
     setInterval(() => {
         const container = document.getElementById('hearts-layer');
         const el = document.createElement('div');
         el.className = 'floating-element';
         
-        if(Math.random() > 0.6) {
+        if(Math.random() > 0.5) {
             const img = document.createElement('img');
             img.src = photos[Math.floor(Math.random() * photos.length)];
-            img.style.cssText = 'width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid white;';
+            img.style.cssText = 'width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.5);';
             el.appendChild(img);
         } else {
             el.innerHTML = '❤️';
-            el.style.fontSize = '20px';
+            el.style.fontSize = '22px';
         }
 
         el.style.left = Math.random() * 95 + 'vw';
@@ -215,48 +256,27 @@
         el.style.animationDuration = dur + 's';
         container.appendChild(el);
         setTimeout(() => el.remove(), dur * 1000);
-    }, 700);
-
-    // Scratch-off Logic
-    function initScratch() {
-        const canvas = document.getElementById('scratch-canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#ff4d8d';
-        ctx.fillRect(0, 0, 300, 400);
-        ctx.fillStyle = 'white';
-        ctx.font = '20px Montserrat';
-        ctx.textAlign = 'center';
-        ctx.fillText('SCRATCH ME', 150, 200);
-
-        let isDrawing = false;
-        const scratch = (e) => {
-            if(!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.pageX || e.touches[0].pageX) - rect.left;
-            const y = (e.pageY || e.touches[0].pageY) - rect.top;
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath();
-            ctx.arc(x, y, 30, 0, Math.PI * 2);
-            ctx.fill();
-        };
-
-        canvas.addEventListener('mousedown', () => isDrawing = true);
-        canvas.addEventListener('touchstart', () => isDrawing = true);
-        window.addEventListener('mouseup', () => isDrawing = false);
-        window.addEventListener('touchend', () => isDrawing = false);
-        canvas.addEventListener('mousemove', scratch);
-        canvas.addEventListener('touchmove', scratch);
-    }
+    }, 600);
 
     function dodge() {
         yesScale += 0.5;
         document.getElementById('yes-btn').style.transform = `scale(${yesScale})`;
-        document.getElementById('no-btn').style.opacity = '0.5';
+        document.getElementById('no-btn').style.opacity = '0.3';
     }
 
     function finish() {
-        confetti({ particleCount: 600, spread: 300, origin: { y: 0.6 } });
-        moveScene(4, 5);
+        const duration = 5 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+        const interval = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+            if (timeLeft <= 0) return clearInterval(interval);
+            const particleCount = 50 * (timeLeft / duration);
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
+        }, 250);
+
+        moveScene(3, 4);
     }
 </script>
 </body>
